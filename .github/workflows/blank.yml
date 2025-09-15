@@ -27,7 +27,7 @@ jobs:
           kubectl apply -f /home/stoungi/CI/job-assignment .
 
           # Wait for the deployment to become available and then get its status
-          kubectl rollout status deployment/my-app
+          kubectl rollout status ds21112/flask-hello-world
 
           # Get the deployment's status and set it as an output
           status=$(kubectl get deployment my-app -o=jsonpath='{.status.conditions[?(@.type=="Available")].status}')
@@ -38,7 +38,7 @@ jobs:
 
   report-status:
     needs: deploy
-    runs-on: ubuntu-latest  # You can use a GitHub-hosted runner here
+    runs-on: fedora  # You can use a GitHub-hosted runner here
     steps:
       - name: Report deployment status
         run: |
