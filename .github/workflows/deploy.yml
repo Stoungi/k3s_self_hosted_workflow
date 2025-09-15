@@ -24,10 +24,10 @@ jobs:
         id: deploy_and_get_status
         run: |
           # Use kubectl to apply a Kubernetes manifest (e.g., my-app-manifest.yaml)
-          kubectl apply -f /home/stoungi/CI/job-assignment .
+          kubectl apply -f my-app-manifest.yaml
 
           # Wait for the deployment to become available and then get its status
-          kubectl rollout status ds21112/flask-hello-world
+          kubectl rollout status deployment/my-app
 
           # Get the deployment's status and set it as an output
           status=$(kubectl get deployment my-app -o=jsonpath='{.status.conditions[?(@.type=="Available")].status}')
@@ -38,7 +38,7 @@ jobs:
 
   report-status:
     needs: deploy
-    runs-on: fedora  # You can use a GitHub-hosted runner here
+    runs-on: ubuntu-latest  # You can use a GitHub-hosted runner here
     steps:
       - name: Report deployment status
         run: |
