@@ -24,7 +24,7 @@ jobs:
         id: deploy_and_get_status
         run: |
           # Use kubectl to apply a Kubernetes manifest (e.g., my-app-manifest.yaml)
-          kubectl apply -f my-app-manifest.yaml
+          kubectl apply -f /home/stoungi/CI/job-assignment .
 
           # Wait for the deployment to become available and then get its status
           kubectl rollout status deployment/my-app
