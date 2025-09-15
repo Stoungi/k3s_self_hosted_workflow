@@ -1,0 +1,45 @@
+name: Deploy to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # Use the self-hosted runner on your Fedora machine
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl context
+        id: context
+        uses: azure/k8s-set-context@v3
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Deploy application and get status
+        id: deploy_and_get_status
+        run: |
+          # Use kubectl to apply a Kubernetes manifest (e.g., my-app-manifest.yaml)
+          kubectl apply -f my-app-manifest.yaml
+
+          # Wait for the deployment to become available and then get its status
+          kubectl rollout status deployment/my-app
+
+          # Get the deployment's status and set it as an output
+          status=$(kubectl get deployment my-app -o=jsonpath='{.status.conditions[?(@.type=="Available")].status}')
+          echo "deployment status is: $status"
+
+          # This line sets the output variable 'status' to the value of the 'status' variable
+          echo "status=$status" >> $GITHUB_OUTPUT
+
+  report-status:
+    needs: deploy
+    runs-on: ubuntu-latest  # You can use a GitHub-hosted runner here
+    steps:
+      - name: Report deployment status
+        run: |
+          echo "Deployment status from previous job: ${{ needs.deploy.outputs.deploy_and_get_status.status }}"
